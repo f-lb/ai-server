@@ -2,6 +2,9 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
+import nltk
+nltk.download('punkt')
+from nltk.tokenize import sent_tokenize
 
 # FastAPI 앱 초기화
 app = FastAPI()
@@ -31,7 +34,8 @@ def predict(text):
 @app.post("/predict")
 def get_prediction(request: TextRequest):
     try:
-        prediction = predict(request.text)
-        return {"prediction": prediction}
+        sentences = sent_tokenize(request.text)
+        predictions = {sentence: predict(sentence) for sentence in sentences}
+        return {"predictions": predictions}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
