@@ -2,17 +2,15 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
-import nltk
-nltk.download('punkt')
-from nltk.tokenize import sent_tokenize
+import kss
 
 # FastAPI 앱 초기화
 app = FastAPI()
 
 # 모델 및 토크나이저 로드
-model_name = "beomi/kcbert-base"
-model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=5)
-model.load_state_dict(torch.load("kc_bert_emotion_classifier.pth", map_location=torch.device('cpu')))
+model_name = "beomi/KcELECTRA-base-v2022"
+model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=6)
+model.load_state_dict(torch.load("KcELECTRA_emotion_classifier.pth", map_location=torch.device('cpu')))
 model.eval()
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
@@ -34,7 +32,7 @@ def predict(text):
 @app.post("/predict")
 def get_prediction(request: TextRequest):
     try:
-        sentences = sent_tokenize(request.text)
+        sentences = kss.split_sentences(request.text)
         predictions = {sentence: predict(sentence) for sentence in sentences}
         return {"predictions": predictions}
     except Exception as e:

@@ -1,3 +1,6 @@
 kc_bert_emotion_classifier.pth
+KcELECTRA_emotion_classifier.pth
+training_data1.xlsx
+training_data2.xlsx
 filb_venv
 __pycache__
